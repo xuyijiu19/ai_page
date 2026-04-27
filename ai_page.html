@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GenAI for Coding – Computer Engineering</title>
+<style>
+  :root{
+    --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;
+    --accent:#16a34a;--warn:#d97706;--danger:#dc2626;
+    --bg:#f1f5f9;--surface:#ffffff;--surface2:#f8fafc;--border:#e2e8f0;
+    --text:#0f172a;--muted:#64748b;--subtle:#94a3b8;
+    --code-bg:#0f172a;--code-text:#e2e8f0;
+    --radius:12px;--shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+    --font:'Segoe UI',system-ui,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.75;font-size:16px;}
+
+  /* ── SITE HEADER ── */
+  header{
+    background:var(--primary);
+    padding:22px 40px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .header-left .eyebrow{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:5px;}
+  .header-left h1{font-size:1.25rem;font-weight:700;color:#fff;letter-spacing:-.02em;}
+  .header-left p{font-size:.83rem;color:rgba(255,255,255,.75);margin-top:2px;}
+  .header-tag{
+    background:rgba(255,255,255,.15);color:#fff;
+    font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    padding:6px 14px;border-radius:99px;white-space:nowrap;border:1px solid rgba(255,255,255,.25);
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap{
+    background:var(--surface);border-bottom:1px solid var(--border);
+    padding:11px 40px;display:flex;align-items:center;gap:14px;
+    position:sticky;top:0;z-index:100;
+    box-shadow:0 1px 0 var(--border),0 2px 8px rgba(0,0,0,.04);
+  }
+  .prog-label{font-size:.78rem;color:var(--muted);white-space:nowrap;min-width:88px;}
+  .bar-track{flex:1;height:6px;background:var(--border);border-radius:99px;overflow:hidden;}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),#06b6d4);border-radius:99px;transition:width .5s ease;width:0%;}
+  .prog-count{font-size:.78rem;color:var(--muted);white-space:nowrap;}
+
+  /* ── NAV TABS ── */
+  nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 40px;display:flex;gap:0;overflow-x:auto;}
+  nav button{
+    background:none;border:none;border-bottom:2px solid transparent;
+    padding:12px 18px;font-size:.83rem;font-weight:500;color:var(--muted);
+    cursor:pointer;white-space:nowrap;transition:color .2s,border-color .2s;font-family:var(--font);
+    display:flex;align-items:center;gap:7px;
+  }
+  nav button:hover{color:var(--primary);}
+  nav button.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600;}
+  .check{display:none;font-size:.68rem;background:var(--accent);color:#fff;padding:2px 7px;border-radius:99px;font-weight:600;}
+  .check.show{display:inline-block;}
+
+  /* ── LAYOUT ── */
+  main{max-width:880px;margin:28px auto;padding:0 20px 72px;}
+  .module{display:none;animation:fadeUp .28s ease;}
+  .module.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* ── CARD ── */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+
+  /* ── FLIP CARDS ── */
+  .flip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 14px 0;
+  }
+  .flip-card {
+    height: 200px;
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.55s ease;
+    transform-style: preserve-3d;
+  }
+  .flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-front, .flip-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid var(--border);
+  }
+  .flip-front {
+    background: var(--surface2);
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+  }
+  .flip-front .flip-icon { font-size: 2rem; }
+  .flip-front .flip-tier {
+    font-size: .65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    padding: 2px 9px;
+    border-radius: 99px;
+  }
+  .flip-front h4 { font-size: .88rem; font-weight: 700; color: var(--text); }
+  .flip-front .flip-hint {
+    font-size: .7rem;
+    color: var(--subtle);
+    margin-top: 4px;
+  }
+  .flip-back {
+    background: var(--primary);
+    color: #fff;
+    transform: rotateY(180deg);
+    gap: 7px;
+  }
+  .flip-back h4 { font-size: .85rem; font-weight: 700; margin-bottom: 2px; }
+  .flip-back ul { padding-left: 15px; font-size: .79rem; line-height: 1.6; }
+  .flip-back .flip-examples {
+    font-size: .72rem;
+    background: rgba(255,255,255,.15);
+    border-radius: 5px;
+    padding: 4px 8px;
+    margin-top: 4px;
+  }
+  .tier-a .flip-front { border-top: 3px solid #2563eb; }
+  .tier-b .flip-front { border-top: 3px solid #16a34a; }
+  .tier-c .flip-front { border-top: 3px solid #d97706; }
+  .tier-a .flip-back { background: #1d4ed8; }
+  .tier-b .flip-back { background: #15803d; }
+  .tier-c .flip-back { background: #b45309; }
+  .tier-a .flip-tier { background: #eff6ff; color: #2563eb; }
+  .tier-b .flip-tier { background: #f0fdf4; color: #16a34a; }
+  .tier-c .flip-tier { background: #fffbeb; color: #d97706; }
+
+  /* ── COMPARISON TABLE HIGHLIGHT ── */
+  .tier-badge {
+    display: inline-block;
+    font-size: .7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+  }
+  .tier-badge.a { background: #eff6ff; color: #2563eb; }
+  .tier-badge.b { background: #f0fdf4; color: #16a34a; }
+  .tier-badge.c { background: #fffbeb; color: #d97706; }
+
+  /* ── MODULE HEADER ── */
+  .mod-header{
+    display:flex;align-items:stretch;
+    border-bottom:1px solid var(--border);
+    min-height:80px;
+  }
+  .mod-header-text{
+    flex:1;padding:22px 26px;
+  }
+  .mod-header-text h2{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:4px;letter-spacing:-.01em;}
+  .mod-header-text p{font-size:.83rem;color:var(--muted);line-height:1.55;}
+  .mod-num-badge{
+    background:var(--primary);color:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:0 26px;min-width:90px;
+    font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    line-height:1.4;text-align:center;flex-shrink:0;
+    border-left:none;
+  }
+  .mod-num-badge .num{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;display:block;line-height:1;}
+  .mod-num-badge .of{font-size:.65rem;opacity:.75;margin-top:3px;}
+
+  .mod-body{padding:28px 30px;}
+
+  /* ── SECTIONS ── */
+  .section{margin-bottom:26px;}
+  .section h3{font-size:.9rem;font-weight:700;color:var(--primary-dark);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.06em;}
+  .section p{font-size:.9rem;margin-bottom:8px;color:var(--text);}
+  .section ul,.section ol{padding-left:18px;font-size:.9rem;}
+  .section li{margin-bottom:6px;}
+
+  /* ── CODE ── */
+  .code-block,.response-text,.prompt-text{font-family:'Courier New',Courier,monospace;white-space: pre-wrap;}  
+  .cm{color:#4ade80;}.kw{color:#c084fc;}.st{color:#86efac;}.fn{color:#93c5fd;}
+
+  /* ── CALLOUT ── */
+  .callout{border-radius:8px;padding:11px 15px;margin:12px 0;font-size:.875rem;display:flex;gap:10px;align-items:flex-start;line-height:1.6;}
+  .callout-icon{flex-shrink:0;margin-top:1px;font-size:.95rem;}
+  .callout.info{background:#eff6ff;border-left:3px solid var(--primary);}
+  .callout.tip{background:#f0fdf4;border-left:3px solid var(--accent);}
+  .callout.warn{background:#fffbeb;border-left:3px solid var(--warn);}
+  .callout.danger{background:#fef2f2;border-left:3px solid var(--danger);}
+
+  /* ── TOOL GRID ── */
+  .tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:10px;margin:12px 0;}
+  .tool-card{
+    background:var(--surface2);border:1px solid var(--border);border-radius:9px;
+    padding:14px 15px;font-size:.83rem;transition:box-shadow .2s,border-color .2s;
+  }
+  .tool-card:hover{border-color:#bfdbfe;box-shadow:0 2px 8px rgba(37,99,235,.08);}
+  .tool-card strong{display:block;margin-bottom:5px;color:var(--text);font-size:.85rem;}
+  .tool-card span{color:var(--muted);line-height:1.55;}
+
+  /* ── PROMPT BOX ── */
+  .prompt-box{background:var(--code-bg);border-radius:9px;overflow:hidden;margin:12px 0;border:1px solid #1e293b;}
+  .p-label{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px;font-weight:700;}
+  .p-label.user{background:#1e3a5f;color:#93c5fd;}
+  .p-label.ai{background:#14532d;color:#86efac;}
+  .p-label.caution{background:#44270a;color:#fbbf24;}
+  .prompt-text{color:#cbd5e1;padding:12px 16px;line-height:1.75;font-size:.8rem;}
+  .response-text{color:#86efac;padding:12px 16px;line-height:1.75;font-size:.8rem;}
+
+  /* ── TABLE ── */
+  .tbl-wrap{overflow-x:auto;margin:12px 0;border-radius:8px;border:1px solid var(--border);}
+  table{width:100%;border-collapse:collapse;font-size:.84rem;}
+  th{background:var(--surface2);padding:9px 13px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);color:var(--text);}
+  td{padding:8px 13px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text);}
+  tr:last-child td{border-bottom:none;}
+  tr:nth-child(even) td{background:var(--surface2);}
+  code{background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:.79rem;font-family:'Courier New',monospace;}
+
+  /* ── DIVIDER ── */
+  .divider{border:none;border-top:1px solid var(--border);margin:26px 0;}
+
+  /* ── QUIZ ── */
+  .quiz-section{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;margin-top:24px;}
+  .quiz-header{display:flex;align-items:center;gap:10px;margin-bottom:3px;}
+  .quiz-header h3{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary-dark);}
+  .quiz-pill{font-size:.7rem;background:var(--primary-light);color:var(--primary);padding:2px 9px;border-radius:99px;font-weight:600;border:1px solid #bfdbfe;}
+  .quiz-sub{font-size:.8rem;color:var(--muted);margin-bottom:18px;}
+  .quiz-q{margin-bottom:18px;}
+  .quiz-q p{font-size:.88rem;font-weight:600;margin-bottom:8px;color:var(--text);}
+  .quiz-q label{
+    display:flex;align-items:flex-start;gap:9px;font-size:.86rem;
+    padding:8px 11px;border-radius:7px;cursor:pointer;
+    transition:background .15s;margin-bottom:3px;border:1px solid transparent;color:var(--text);
+  }
+  .quiz-q label:hover{background:var(--primary-light);}
+  .quiz-q label input{margin-top:3px;accent-color:var(--primary);}
+  .quiz-q label.correct{background:#f0fdf4;border-color:#86efac;}
+  .quiz-q label.wrong{background:#fef2f2;border-color:#fca5a5;}
+  .quiz-feedback{font-size:.79rem;margin-top:5px;padding:5px 10px;border-radius:5px;}
+  .quiz-feedback.ok{background:#dcfce7;color:#15803d;}
+  .quiz-feedback.bad{background:#fee2e2;color:#b91c1c;}
+  .quiz-btn{
+    background:var(--primary);color:#fff;border:none;
+    padding:10px 26px;border-radius:7px;font-size:.86rem;font-weight:600;
+    cursor:pointer;margin-top:6px;transition:background .2s,transform .1s;
+    font-family:var(--font);letter-spacing:.01em;
+  }
+  .quiz-btn:hover{background:var(--primary-dark);}
+  .quiz-btn:active{transform:scale(.98);}
+  .quiz-result{margin-top:12px;padding:11px 15px;border-radius:8px;font-size:.86rem;font-weight:600;display:none;}
+  .quiz-result.pass{background:#dcfce7;color:#15803d;border:1px solid #86efac;}
+  .quiz-result.fail{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;}
+  .badge-wrap{display:none;text-align:center;padding:16px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:9px;margin-top:12px;}
+  .badge-wrap .badge-icon{font-size:1.8rem;}
+  .badge-wrap p{font-size:.85rem;color:#15803d;font-weight:600;margin-top:5px;}
+
+  /* ── MODULE NAV ── */
+  .mod-nav{display:flex;justify-content:space-between;margin-top:22px;gap:10px;}
+  .mod-nav button{
+    background:var(--surface);border:1px solid var(--border);
+    padding:9px 20px;border-radius:7px;font-size:.84rem;font-weight:600;
+    cursor:pointer;color:var(--primary);transition:all .2s;font-family:var(--font);
+  }
+  .mod-nav button:hover:not(:disabled){background:var(--primary-light);border-color:#bfdbfe;}
+  .mod-nav button:disabled{opacity:.3;cursor:default;}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:640px){
+    header{padding:16px 18px;}
+    .header-tag{display:none;}
+    .progress-wrap{padding:10px 16px;}
+    nav{padding:0 10px;}
+    nav button{padding:10px 11px;font-size:.77rem;}
+    main{padding:0 12px 56px;}
+    .mod-body{padding:20px 16px;}
+    .mod-header-text{padding:16px 16px;}
+    .mod-num-badge{padding:0 16px;min-width:70px;}
+    .mod-num-badge .num{font-size:1.3rem;}
+    .tool-grid{grid-template-columns:1fr 1fr;}
+    .mod-nav button{padding:9px 14px;}
+  }
+  @media(max-width:400px){.tool-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="eyebrow">ET0744 Full Stack Development &nbsp;·&nbsp; Self-Directed Learning</div>
+    <h1>Generative AI for Coding</h1>
+    <p>Learn to use AI tools effectively and responsibly in your development work.</p>
+  </div>
+  <div class="header-tag">4 Modules</div>
+</header>
+
+<div class="progress-wrap">
+  <span class="prog-label" id="progressLabel">0% Complete</span>
+  <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+  <span class="prog-count" id="progressModules">0 / 4 done</span>
+</div>
+
+<nav role="tablist">
+  <button role="tab" class="active" onclick="showModule(0)">1. What is GenAI<span class="check" id="chk0">Done</span></button>
+  <button role="tab" onclick="showModule(1)">2. Prompting<span class="check" id="chk1">Done</span></button>
+  <button role="tab" onclick="showModule(2)">3. Code Review<span class="check" id="chk2">Done</span></button>
+  <button role="tab" onclick="showModule(3)">4. Ethics<span class="check" id="chk3">Done</span></button>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════ MODULE 1 ══ -->
+<div class="module active" id="mod0"><div class="card">
+  <div class="mod-header">
+    <div class="mod-header-text">
+      <h2>What is GenAI for Developers?</h2>
+      <p>Understand what Generative AI is, how it fits your workflow, and the tools available to you.</p>
+    </div>
+    <div class="mod-num-badge"><span class="num">1</span><span class="of">of 4</span></div>
+  </div>
+  <div class="mod-body">
+
+    <div class="section">
+      <h3>What is Generative AI?</h3>
+      <p>Generative AI (GenAI) refers to AI systems that can <strong>create new content</strong> — such as text, code, or images — based on patterns learned from large amounts of data.</p>
+      <p>Unlike traditional programs that follow fixed rules, GenAI models like ChatGPT or GitHub Copilot learn from millions of examples and can generate human-like responses and working code.</p>
+      <div class="callout info">
+        <span class="callout-icon">💡</span>
+        <span>Think of it as a very experienced coding mentor who has read every Stack Overflow post and GitHub repository — and can instantly suggest solutions to your problems.</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Traditional Programming vs. Generative AI</h3>
+      <div class="tbl-wrap"><table>
+        <tr><th>Traditional Programming</th><th>Generative AI</th></tr>
+        <tr><td>You write every line of code</td><td>AI suggests or generates code for you</td></tr>
+        <tr><td>Follows exact rules you define</td><td>Learns patterns from data</td></tr>
+        <tr><td>Breaks if input is unexpected</td><td>Handles natural language input</td></tr>
+        <tr><td>No creativity</td><td>Can generate novel solutions</td></tr>
+      </table></div>
+    </div>
+
+
+    <div class="section">
+        <h3>Categories of AI Coding Tools</h3>
+        <p>AI coding tools are not all the same. They fall into <strong>three tiers</strong> — each suited to different tasks. Click each card to learn more.</p>
+  
+        <div class="flip-grid">
+  
+          <!-- Tier A -->
+          <div class="flip-card tier-a" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-front">
+                <span class="flip-icon">⌨️</span>
+                <span class="flip-tier">Tier A</span>
+                <h4>Inline Assistants</h4>
+                <span class="flip-hint">Tap to see details →</span>
+              </div>
+              <div class="flip-back">
+                <h4>Inline / IDE-Integrated</h4>
+                <ul>
+                  <li>Lives inside your code editor</li>
+                  <li>Autocomplete &amp; ghost-text suggestions</li>
+                  <li>Best for boilerplate &amp; repetitive patterns</li>
+                </ul>
+                <div class="flip-examples">📌 e.g. GitHub Copilot, Tabnine</div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Tier B -->
+          <div class="flip-card tier-b" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-front">
+                <span class="flip-icon">💬</span>
+                <span class="flip-tier">Tier B</span>
+                <h4>Conversational Assistants</h4>
+                <span class="flip-hint">Tap to see details →</span>
+              </div>
+              <div class="flip-back">
+                <h4>Chat / Prompt-Based</h4>
+                <ul>
+                  <li>You type a prompt, AI responds</li>
+                  <li>Explain, debug, generate snippets</li>
+                  <li>Best for learning &amp; problem-solving</li>
+                </ul>
+                <div class="flip-examples">📌 e.g. ChatGPT, Claude, Gemini</div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Tier C -->
+          <div class="flip-card tier-c" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-front">
+                <span class="flip-icon">🤖</span>
+                <span class="flip-tier">Tier C</span>
+                <h4>Agentic &amp; Specialised AI</h4>
+                <span class="flip-hint">Tap to see details →</span>
+              </div>
+              <div class="flip-back">
+                <h4>Agent / Tool-Using AI</h4>
+                <ul>
+                  <li>Can run code, read files, edit projects</li>
+                  <li>Specialised: docs, tests, UI generation</li>
+                  <li>Best for larger, multi-step tasks</li>
+                </ul>
+                <div class="flip-examples">📌 e.g. Cursor, v0, Mintlify</div>
+              </div>
+            </div>
+          </div>
+  
+        </div>
+  
+        <!-- Comparison table -->
+        <div class="tbl-wrap" style="margin-top:16px;">
+          <table>
+            <tr>
+              <th>Category</th>
+              <th>How You Use It</th>
+              <th>Example</th>
+              <th>Best For</th>
+            </tr>
+            <tr>
+              <td><span class="tier-badge a">Tier A</span> Inline Assistant</td>
+              <td>Ghost-text inside your editor</td>
+              <td>GitHub Copilot</td>
+              <td>Boilerplate, repetitive patterns</td>
+            </tr>
+            <tr>
+              <td><span class="tier-badge b">Tier B</span> Conversational</td>
+              <td>Chat prompt → response</td>
+              <td>ChatGPT, Claude</td>
+              <td>Explanations, debugging, learning</td>
+            </tr>
+            <tr>
+              <td><span class="tier-badge c">Tier C</span> Agentic / Specialised</td>
+              <td>AI plans &amp; acts across files</td>
+              <td>Cursor, v0, Mintlify</td>
+              <td>Multi-file tasks, docs, UI prototyping</td>
+            </tr>
+          </table>
+        </div>
+  
+        <div class="callout info" style="margin-top:12px;">
+          <span class="callout-icon">💡</span>
+          <span><strong>Key takeaway:</strong> Copilot ≠ ChatGPT ≠ Cursor. Each tool has a different role. Knowing <em>when</em> to use which type makes you a far more effective developer.</span>
+        </div>
+    </div>
+
+    <div class="section">
+      <h3>Example: AI Helping with JavaScript</h3>
+      <p>You ask an AI to help write a function for a webpage you are building:</p>
+      <div class="prompt-box">
+        <div class="p-label user">Your Prompt</div>
+        <div class="prompt-text">Write a JavaScript function that takes an array of numbers and returns only the even numbers.</div>
+        <div class="p-label ai">AI Response</div>
+        <div class="response-text"><span class="cm">// Filters and returns only even numbers from an array</span>
+<span class="kw">function</span> <span class="fn">getEvenNumbers</span>(numbers) {
+  <span class="kw">return</span> numbers.<span class="fn">filter</span>(num => num % 2 === 0);
+}
+
+<span class="kw">const</span> result = <span class="fn">getEvenNumbers</span>([1, 2, 3, 4, 5, 6]);
+console.<span class="fn">log</span>(result); <span class="cm">// [2, 4, 6]</span></div>
+      </div>
+      <div class="callout tip">
+        <span class="callout-icon">✅</span>
+        <span>AI gives you a working solution — but it's your job to <strong>understand what it does</strong> and test it in your project.</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Where Does GenAI Fit in Your Workflow?</h3>
+      <ul>
+        <li><strong>Starting a project</strong> — Generate boilerplate HTML/CSS or an Express server setup</li>
+        <li><strong>Debugging</strong> — Paste your error message and ask AI to explain it</li>
+        <li><strong>Learning</strong> — Ask AI to explain unfamiliar code or concepts</li>
+        <li><strong>Refactoring</strong> — Ask AI to rewrite messy code more cleanly</li>
+        <li><strong>Testing</strong> — Generate test cases for your functions</li>
+      </ul>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="quiz-section">
+      <div class="quiz-header"><h3>Check Your Understanding</h3><span class="quiz-pill">3 Questions</span></div>
+      <div class="quiz-sub">Answer all questions, then click Submit.</div>
+      <div class="quiz-q" id="q0_0">
+        <p>1. What makes Generative AI different from traditional programming tools?</p>
+        <label><input type="radio" name="q0_0" value="a"> It only works with Python code.</label>
+        <label><input type="radio" name="q0_0" value="b"> It learns from data and generates new content based on patterns.</label>
+        <label><input type="radio" name="q0_0" value="c"> It replaces the need for any human programmer.</label>
+        <label><input type="radio" name="q0_0" value="d"> It only autocompletes single lines of code.</label>
+      </div>
+      <div class="quiz-q" id="q0_1">
+        <p>2. Which of these is an example of a Code Autocomplete AI tool?</p>
+        <label><input type="radio" name="q0_1" value="a"> ChatGPT</label>
+        <label><input type="radio" name="q0_1" value="b"> Mintlify</label>
+        <label><input type="radio" name="q0_1" value="c"> GitHub Copilot</label>
+        <label><input type="radio" name="q0_1" value="d"> CodiumAI</label>
+      </div>
+      <div class="quiz-q" id="q0_2">
+        <p>3. A student gets AI to generate a function. What should they do next?</p>
+        <label><input type="radio" name="q0_2" value="a"> Submit it directly without reading it.</label>
+        <label><input type="radio" name="q0_2" value="b"> Understand what it does and test it in their project.</label>
+        <label><input type="radio" name="q0_2" value="c"> Delete it because AI code is always wrong.</label>
+        <label><input type="radio" name="q0_2" value="d"> Copy it into every project they have.</label>
+      </div>
+      <button class="quiz-btn" onclick="submitQuiz(0)">Submit Answers</button>
+      <div class="quiz-result" id="result0"></div>
+      <div class="badge-wrap" id="badge0"><div class="badge-icon">🏅</div><p>Module 1 Complete</p></div>
+    </div>
+
+    <div class="mod-nav">
+      <button disabled>← Previous</button>
+      <button onclick="showModule(1)">Next Module →</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════ MODULE 2 ══ -->
+<div class="module" id="mod1"><div class="card">
+  <div class="mod-header">
+    <div class="mod-header-text">
+      <h2>Prompting Techniques</h2>
+      <p>Learn how to write clear, effective prompts to get the most useful code and explanations from AI.</p>
+    </div>
+    <div class="mod-num-badge"><span class="num">2</span><span class="of">of 4</span></div>
+  </div>
+  <div class="mod-body">
+
+    <div class="section">
+      <h3>Why Does Prompting Matter?</h3>
+      <p>AI tools are only as good as the instructions you give them. A vague prompt gives a vague answer. A clear, detailed prompt gives a precise, useful answer.</p>
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <span><strong>Garbage in, garbage out.</strong> If your prompt is unclear, the AI will guess — and may give you something that looks right but does not work for your situation.</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Technique 1: Be Specific and Give Context</h3>
+      <p>Always tell the AI <em>what</em> you want, <em>why</em> you need it, and <em>what environment</em> you're working in.</p>
+      <div class="prompt-box">
+        <div class="p-label caution">Vague Prompt</div>
+        <div class="prompt-text">Make a button.</div>
+        <div class="p-label ai">Result</div>
+        <div class="response-text">A generic button with no styling or functionality — probably not what you wanted.</div>
+      </div>
+      <div class="prompt-box">
+        <div class="p-label user">Specific Prompt</div>
+        <div class="prompt-text">I'm building a student registration form in HTML and CSS. Create a "Submit" button that is blue, rounded, full-width, and shows a hover effect. No JavaScript needed.</div>
+        <div class="p-label ai">AI Response</div>
+        <div class="response-text">.<span class="fn">submit-btn</span> {
+  <span class="kw">background-color</span>: <span class="st">#2563eb</span>;
+  <span class="kw">color</span>: <span class="st">white</span>;
+  <span class="kw">width</span>: <span class="st">100%</span>;
+  <span class="kw">padding</span>: <span class="st">12px</span>;
+  <span class="kw">border</span>: <span class="st">none</span>;
+  <span class="kw">border-radius</span>: <span class="st">8px</span>;
+  <span class="kw">cursor</span>: <span class="st">pointer</span>;
+  <span class="kw">transition</span>: <span class="st">background 0.2s</span>;
+}
+.<span class="fn">submit-btn</span>:<span class="fn">hover</span> { <span class="kw">background-color</span>: <span class="st">#1d4ed8</span>; }</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Technique 2: Zero-Shot vs. Few-Shot Prompting</h3>
+      <p><strong>Zero-shot</strong> — No examples, just a direct instruction. Good for simple tasks.</p>
+      <p><strong>Few-shot</strong> — You provide 1–2 examples. Ideal when you have a specific pattern in mind.</p>
+      <div class="prompt-box">
+        <div class="p-label user">Few-Shot Example</div>
+        <div class="prompt-text">Convert these variable names from camelCase to snake_case.
+
+Input: firstName → Output: first_name
+Input: totalScore → Output: total_score
+Input: userEmailAddress → Output: ?</div>
+        <div class="p-label ai">AI Response</div>
+        <div class="response-text">Output: user_email_address</div>
+      </div>
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <span>Few-shot prompting works great for repetitive code — like multiple React components or database queries that follow the same pattern.</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Technique 3: Role Prompting</h3>
+      <p>Tell the AI to act as a specific expert. This shifts the style and depth of its response.</p>
+      <div class="prompt-box">
+        <div class="p-label user">Role Prompt</div>
+        <div class="prompt-text">You are a senior Node.js developer teaching a first-year polytechnic student. Explain what middleware is in Express.js using a simple analogy, then show a basic example.</div>
+        <div class="p-label ai">AI Response</div>
+        <div class="response-text"><span class="cm">// Middleware is like a security guard at a mall —
+// every visitor (request) passes through before reaching the shops (routes).</span>
+
+<span class="kw">const</span> app = <span class="fn">require</span>(<span class="st">'express'</span>)();
+
+app.<span class="fn">use</span>((req, res, next) => {
+  console.<span class="fn">log</span>(<span class="st">`${req.method} ${req.url}`</span>);
+  <span class="fn">next</span>();
+});
+
+app.<span class="fn">get</span>(<span class="st">'/'</span>, (req, res) => res.<span class="fn">send</span>(<span class="st">'Hello!'</span>));
+app.<span class="fn">listen</span>(3000);</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Technique 4: Chain-of-Thought</h3>
+      <p>Ask AI to reason step by step before giving a final answer. This reduces mistakes on complex problems.</p>
+      <div class="prompt-box">
+        <div class="p-label user">Chain-of-Thought Prompt</div>
+        <div class="prompt-text">I want to fetch data from an API and display it in a React component. Think through the steps first, then write the code using fetch() with useState and useEffect hooks.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Prompting Cheat Sheet</h3>
+      <div class="tbl-wrap"><table>
+        <tr><th>Technique</th><th>When to Use</th><th>Example Phrase</th></tr>
+        <tr><td>Be Specific</td><td>Always</td><td>"I am building X using Y. Write Z that does..."</td></tr>
+        <tr><td>Zero-Shot</td><td>Simple, clear tasks</td><td>"Write a function that..."</td></tr>
+        <tr><td>Few-Shot</td><td>Repeating patterns</td><td>"Here are 2 examples — now do the same for..."</td></tr>
+        <tr><td>Role Prompt</td><td>Need a specific depth or style</td><td>"Act as a senior dev and review..."</td></tr>
+        <tr><td>Chain-of-Thought</td><td>Complex logic problems</td><td>"Think step by step, then write the code."</td></tr>
+      </table></div>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="quiz-section">
+      <div class="quiz-header"><h3>Check Your Understanding</h3><span class="quiz-pill">3 Questions</span></div>
+      <div class="quiz-sub">Answer all questions, then click Submit.</div>
+      <div class="quiz-q" id="q1_0">
+        <p>1. What is the main benefit of few-shot prompting?</p>
+        <label><input type="radio" name="q1_0" value="a"> It reduces the number of words in your prompt.</label>
+        <label><input type="radio" name="q1_0" value="b"> It gives the AI examples to follow so output matches a specific pattern.</label>
+        <label><input type="radio" name="q1_0" value="c"> It forces the AI to use Python only.</label>
+        <label><input type="radio" name="q1_0" value="d"> It makes the AI respond faster.</label>
+      </div>
+      <div class="quiz-q" id="q1_1">
+        <p>2. Which technique is best for complex logic where you want AI to show its reasoning?</p>
+        <label><input type="radio" name="q1_1" value="a"> Zero-Shot Prompting</label>
+        <label><input type="radio" name="q1_1" value="b"> Role Prompting</label>
+        <label><input type="radio" name="q1_1" value="c"> Chain-of-Thought Prompting</label>
+        <label><input type="radio" name="q1_1" value="d"> Vague Prompting</label>
+      </div>
+      <div class="quiz-q" id="q1_2">
+        <p>3. A student prompts: "Make a login page." What is wrong with this prompt?</p>
+        <label><input type="radio" name="q1_2" value="a"> It is too long.</label>
+        <label><input type="radio" name="q1_2" value="b"> It uses the wrong language.</label>
+        <label><input type="radio" name="q1_2" value="c"> It is too vague — it lacks context about tech stack, style, or requirements.</label>
+        <label><input type="radio" name="q1_2" value="d"> Login pages cannot be made with AI.</label>
+      </div>
+      <button class="quiz-btn" onclick="submitQuiz(1)">Submit Answers</button>
+      <div class="quiz-result" id="result1"></div>
+      <div class="badge-wrap" id="badge1"><div class="badge-icon">🏅</div><p>Module 2 Complete</p></div>
+    </div>
+
+    <div class="mod-nav">
+      <button onclick="showModule(0)">← Previous</button>
+      <button onclick="showModule(2)">Next Module →</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════ MODULE 3 ══ -->
+<div class="module" id="mod2"><div class="card">
+  <div class="mod-header">
+    <div class="mod-header-text">
+      <h2>Code Review &amp; Analysis Using AI</h2>
+      <p>Use AI to spot bugs, improve code quality, understand unfamiliar code, and refactor effectively.</p>
+    </div>
+    <div class="mod-num-badge"><span class="num">3</span><span class="of">of 4</span></div>
+  </div>
+  <div class="mod-body">
+
+    <div class="section">
+      <h3>What is Code Review?</h3>
+      <p>Code review is the process of examining code to find bugs, improve readability, and ensure it follows good practices. Traditionally done by a senior developer — now AI can assist too.</p>
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <span>AI will not replace human code review, but it can catch common mistakes quickly and help you learn <em>why</em> something is wrong — not just that it is wrong.</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>1. Debugging with AI</h3>
+      <p>When you get an error, paste your code <em>and</em> the error message into AI chat. Ask it to explain what's wrong and suggest a fix.</p>
+      <div class="prompt-box">
+        <div class="p-label user">Student Prompt</div>
+        <div class="prompt-text">This Express code gives me: "Cannot set headers after they are sent to the client":
+
+app.get('/user', (req, res) => {
+  if (!req.query.id) {
+    res.send('No ID provided');
+  }
+  res.send('User found');
+});</div>
+        <div class="p-label ai">AI Explanation</div>
+        <div class="response-text"><span class="cm">// Problem: res.send() is called twice.
+// Fix: add return so execution stops after the first response.</span>
+
+app.<span class="fn">get</span>(<span class="st">'/user'</span>, (req, res) => {
+  <span class="kw">if</span> (!req.query.id) {
+    <span class="kw">return</span> res.<span class="fn">send</span>(<span class="st">'No ID provided'</span>); <span class="cm">// ← return added</span>
+  }
+  res.<span class="fn">send</span>(<span class="st">'User found'</span>);
+});</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>2. Asking AI to Review Your Code</h3>
+      <div class="prompt-box">
+        <div class="p-label user">Code Review Prompt</div>
+        <div class="prompt-text">Review this React component for bugs or bad practices. I am a beginner building a to-do list:
+
+function TodoList({ items }) {
+  return (
+    &lt;ul&gt;
+      {items.map(item => (
+        &lt;li&gt;{item.text}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</div>
+        <div class="p-label ai">AI Feedback</div>
+        <div class="response-text"><span class="cm">// Issue: Missing 'key' prop. React needs this to track list items.</span>
+
+<span class="kw">function</span> <span class="fn">TodoList</span>({ items }) {
+  <span class="kw">return</span> (
+    &lt;ul&gt;
+      {items.<span class="fn">map</span>(item => (
+        &lt;li <span class="kw">key</span>={item.id}&gt;{item.text}&lt;/li&gt; <span class="cm">// ← key added</span>
+      ))}
+    &lt;/ul&gt;
+  );
+}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>3. Understanding Unfamiliar Code</h3>
+      <div class="prompt-box">
+        <div class="p-label user">Explanation Prompt</div>
+        <div class="prompt-text">Explain this JavaScript line by line for a first-year student:
+
+const doubled = [1,2,3].map(x => x * 2);</div>
+        <div class="p-label ai">AI Response</div>
+        <div class="response-text"><span class="cm">// [1,2,3]   → an array of three numbers
+// .map()    → applies a function to each item
+// x => x*2 → multiply each number by 2
+// Result: doubled = [2, 4, 6]</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>4. Refactoring Code with AI</h3>
+      <div class="prompt-box">
+        <div class="p-label user">Refactor Prompt</div>
+        <div class="prompt-text">Refactor this into cleaner code without changing functionality:
+
+function c(a,b,d){if(d==="add"){return a+b;}else if(d==="sub"){return a-b;}else{return 0;}}</div>
+        <div class="p-label ai">Refactored Code</div>
+        <div class="response-text"><span class="kw">function</span> <span class="fn">calculate</span>(numA, numB, operation) {
+  <span class="kw">if</span> (operation === <span class="st">'add'</span>) <span class="kw">return</span> numA + numB;
+  <span class="kw">if</span> (operation === <span class="st">'sub'</span>) <span class="kw">return</span> numA - numB;
+  <span class="kw">return</span> 0;
+}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Best Practices</h3>
+      <ul>
+        <li>Always <strong>read and understand</strong> AI suggestions before applying them.</li>
+        <li><strong>Test the fixed code</strong> — AI can introduce new bugs while fixing old ones.</li>
+        <li>Ask AI to <strong>explain why</strong> something is wrong, not just how to fix it.</li>
+        <li>Use AI as a <strong>learning tool</strong> — understand the fix so you don't repeat the mistake.</li>
+        <li>Never blindly copy-paste fixes without understanding them.</li>
+      </ul>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="quiz-section">
+      <div class="quiz-header"><h3>Check Your Understanding</h3><span class="quiz-pill">3 Questions</span></div>
+      <div class="quiz-sub">Answer all questions, then click Submit.</div>
+      <div class="quiz-q" id="q2_0">
+        <p>1. What should you include when asking AI to help debug your code?</p>
+        <label><input type="radio" name="q2_0" value="a"> Only the error message.</label>
+        <label><input type="radio" name="q2_0" value="b"> Only your code.</label>
+        <label><input type="radio" name="q2_0" value="c"> Both your code and the error message, plus context about your project.</label>
+        <label><input type="radio" name="q2_0" value="d"> Your lecturer's name and the assignment title.</label>
+      </div>
+      <div class="quiz-q" id="q2_1">
+        <p>2. After AI fixes a bug in your code, what should you do?</p>
+        <label><input type="radio" name="q2_1" value="a"> Submit the code immediately.</label>
+        <label><input type="radio" name="q2_1" value="b"> Delete your original and replace it.</label>
+        <label><input type="radio" name="q2_1" value="c"> Understand the fix, test it, and make sure it works correctly.</label>
+        <label><input type="radio" name="q2_1" value="d"> Share the fix with all your classmates.</label>
+      </div>
+      <div class="quiz-q" id="q2_2">
+        <p>3. What does "refactoring" code mean?</p>
+        <label><input type="radio" name="q2_2" value="a"> Completely changing what the code does.</label>
+        <label><input type="radio" name="q2_2" value="b"> Deleting unnecessary files from your project.</label>
+        <label><input type="radio" name="q2_2" value="c"> Rewriting code to be cleaner without changing its behaviour.</label>
+        <label><input type="radio" name="q2_2" value="d"> Converting code from one language to another.</label>
+      </div>
+      <button class="quiz-btn" onclick="submitQuiz(2)">Submit Answers</button>
+      <div class="quiz-result" id="result2"></div>
+      <div class="badge-wrap" id="badge2"><div class="badge-icon">🏅</div><p>Module 3 Complete</p></div>
+    </div>
+
+    <div class="mod-nav">
+      <button onclick="showModule(1)">← Previous</button>
+      <button onclick="showModule(3)">Next Module →</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════ MODULE 4 ══ -->
+<div class="module" id="mod3"><div class="card">
+  <div class="mod-header">
+    <div class="mod-header-text">
+      <h2>AI Ethics &amp; Limitations</h2>
+      <p>Understand the risks of AI-generated code, academic integrity, and how to use AI responsibly.</p>
+    </div>
+    <div class="mod-num-badge"><span class="num">4</span><span class="of">of 4</span></div>
+  </div>
+  <div class="mod-body">
+
+    <div class="section">
+      <h3>Limitation 1: AI Hallucinations</h3>
+      <p>AI models can confidently produce code that looks correct but is completely wrong. This is called a <strong>hallucination</strong>.</p>
+      <div class="callout danger">
+        <span class="callout-icon">🚨</span>
+        <span>AI may invent function names or library features that do not exist. Always verify AI-generated code by running it and checking the official documentation.</span>
+      </div>
+      <div class="prompt-box">
+        <div class="p-label caution">Example of a Hallucination</div>
+        <div class="response-text">app.<span class="fn">useAutoAuth</span>({ provider: <span class="st">'google'</span> });
+<span class="cm">// This method does NOT exist in Express.js.
+// AI invented it — your code will crash.</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Limitation 2: Outdated Information</h3>
+      <p>AI is trained on data up to a certain date and may not know about the latest versions, new APIs, or recent security patches.</p>
+      <div class="tbl-wrap"><table>
+        <tr><th>Scenario</th><th>Risk</th><th>What To Do</th></tr>
+        <tr><td>AI suggests a deprecated React method</td><td>Code breaks in newer versions</td><td>Check the official React docs</td></tr>
+        <tr><td>AI recommends an outdated npm package</td><td>Security vulnerabilities</td><td>Run <code>npm audit</code> after installing</td></tr>
+        <tr><td>AI shows old Express syntax</td><td>Incompatibility with Express 5+</td><td>Verify against the official Express docs</td></tr>
+      </table></div>
+    </div>
+
+    <div class="section">
+      <h3>Limitation 3: No Knowledge of Your Full Project</h3>
+      <p>AI only sees what you paste into the chat. It has no knowledge of your full project structure, existing variables, or other files — which can lead to suggestions that break other parts of your code.</p>
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <span>Describe your project structure or paste related files so the AI can give more accurate, context-aware advice.</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Academic Integrity</h3>
+      <div class="tbl-wrap"><table>
+        <tr><th>✅ Acceptable Use</th><th>❌ Not Acceptable</th></tr>
+        <tr><td>Using AI to understand a concept</td><td>Submitting AI-generated code as entirely your own</td></tr>
+        <tr><td>Using AI to debug your own code</td><td>Having AI complete entire assignments for you</td></tr>
+        <tr><td>Using AI for a first draft, then rewriting it</td><td>Copy-pasting AI output without understanding it</td></tr>
+        <tr><td>Declaring AI use when required by your lecturer</td><td>Not disclosing AI use when required</td></tr>
+      </table></div>
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <span>Always follow your school's AI policy. When in doubt, ask your lecturer before using AI on a graded task.</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Intellectual Property and Privacy</h3>
+      <ul>
+        <li><strong>Never paste private data</strong> — Credentials, API keys, and user data should never go into a public AI tool.</li>
+        <li><strong>Code ownership is unclear</strong> — AI-generated code may reflect copyrighted patterns. Check your organisation's policy for production projects.</li>
+        <li><strong>Your prompts may be stored</strong> — Be careful what confidential project details you share.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h3>AI as a Tool, Not a Crutch</h3>
+      <div class="callout tip">
+        <span class="callout-icon">🎯</span>
+        <span>The goal is to become a <strong>better developer</strong> — not just a better AI user. Use AI to speed up your learning and remove blockers, but make sure you understand everything you submit. Your skills are what will matter in your career.</span>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="quiz-section">
+      <div class="quiz-header"><h3>Check Your Understanding</h3><span class="quiz-pill">3 Questions</span></div>
+      <div class="quiz-sub">Answer all questions, then click Submit.</div>
+      <div class="quiz-q" id="q3_0">
+        <p>1. What is an AI "hallucination" in coding?</p>
+        <label><input type="radio" name="q3_0" value="a"> When the AI generates code that runs too slowly.</label>
+        <label><input type="radio" name="q3_0" value="b"> When the AI confidently produces incorrect or non-existent code or functions.</label>
+        <label><input type="radio" name="q3_0" value="c"> When the AI refuses to answer a question.</label>
+        <label><input type="radio" name="q3_0" value="d"> When the AI takes too long to respond.</label>
+      </div>
+      <div class="quiz-q" id="q3_1">
+        <p>2. Which is an example of acceptable AI use in an assignment?</p>
+        <label><input type="radio" name="q3_1" value="a"> Asking AI to complete the entire assignment and submitting it.</label>
+        <label><input type="radio" name="q3_1" value="b"> Using AI to understand a concept you're stuck on, then writing the code yourself.</label>
+        <label><input type="radio" name="q3_1" value="c"> Copy-pasting AI code without reading it.</label>
+        <label><input type="radio" name="q3_1" value="d"> Sharing your API keys with AI to get better answers.</label>
+      </div>
+      <div class="quiz-q" id="q3_2">
+        <p>3. Why should you never paste your database password into a public AI tool?</p>
+        <label><input type="radio" name="q3_2" value="a"> Because AI cannot read passwords.</label>
+        <label><input type="radio" name="q3_2" value="b"> Because it slows down the AI's response.</label>
+        <label><input type="radio" name="q3_2" value="c"> Because your prompt may be stored or used for training, exposing private credentials.</label>
+        <label><input type="radio" name="q3_2" value="d"> Because passwords are too short to be useful context.</label>
+      </div>
+      <button class="quiz-btn" onclick="submitQuiz(3)">Submit Answers</button>
+      <div class="quiz-result" id="result3"></div>
+      <div class="badge-wrap" id="badge3"><div class="badge-icon">🎓</div><p>Course Complete — All 4 Modules Done!</p></div>
+    </div>
+
+    <div class="mod-nav">
+      <button onclick="showModule(2)">← Previous</button>
+      <button disabled>Course Complete</button>
+    </div>
+  </div>
+</div></div>
+
+</main>
+
+<script>
+const ANSWERS={0:['b','c','b'],1:['b','c','c'],2:['c','c','c'],3:['b','b','c']};
+const completed=[false,false,false,false];
+
+function showModule(i){
+  document.querySelectorAll('.module').forEach((m,idx)=>m.classList.toggle('active',idx===i));
+  document.querySelectorAll('nav button').forEach((b,idx)=>b.classList.toggle('active',idx===i));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function submitQuiz(mod){
+  const qs=ANSWERS[mod];let score=0,allAnswered=true;
+  qs.forEach((correct,qi)=>{
+    const name=`q${mod}_${qi}`;
+    const sel=document.querySelector(`input[name="${name}"]:checked`);
+    const qEl=document.getElementById(`q${mod}_${qi}`);
+    qEl.querySelectorAll('label').forEach(l=>l.classList.remove('correct','wrong'));
+    const old=qEl.querySelector('.quiz-feedback');if(old)old.remove();
+    if(!sel){allAnswered=false;return;}
+    qEl.querySelectorAll('label').forEach(l=>{
+      const v=l.querySelector('input').value;
+      if(v===correct)l.classList.add('correct');
+      else if(l.querySelector('input')===sel)l.classList.add('wrong');
+    });
+    const fb=document.createElement('div');
+    fb.className='quiz-feedback '+(sel.value===correct?'ok':'bad');
+    fb.textContent=sel.value===correct?'Correct.':'Not quite — see the highlighted answer above.';
+    qEl.appendChild(fb);
+    if(sel.value===correct)score++;
+  });
+  if(!allAnswered){alert('Please answer all questions before submitting.');return;}
+  const resultEl=document.getElementById(`result${mod}`);
+  const badgeEl=document.getElementById(`badge${mod}`);
+  const pass=score>=2;
+  resultEl.style.display='block';
+  resultEl.className='quiz-result '+(pass?'pass':'fail');
+  resultEl.textContent=pass
+    ?`Well done! You scored ${score} out of ${qs.length}. Module complete.`
+    :`You scored ${score} out of ${qs.length}. Review the content above and try again.`;
+  if(pass&&!completed[mod]){
+    completed[mod]=true;
+    badgeEl.style.display='block';
+    document.getElementById(`chk${mod}`).classList.add('show');
+    updateProgress();
+  }
+}
+
+function updateProgress(){
+  const done=completed.filter(Boolean).length;
+  const pct=Math.round((done/4)*100);
+  document.getElementById('barFill').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=pct+'% Complete';
+  document.getElementById('progressModules').textContent=done+' / 4 done';
+}
+</script>
+</body>
+</html>
