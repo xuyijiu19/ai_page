@@ -69,21 +69,24 @@
   /* ── FLIP CARDS ── */
   .flip-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 14px;
-    margin: 14px 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 14px 0 10px;
   }
   .flip-card {
-    height: 200px;
-    perspective: 1000px;
+    height: 214px;
+    perspective: 1200px;
     cursor: pointer;
   }
   .flip-card-inner {
     position: relative;
     width: 100%;
     height: 100%;
-    transition: transform 0.55s ease;
+    transition: transform .55s ease;
     transform-style: preserve-3d;
+  }
+  .flip-card:hover .flip-card-inner {
+    transform: translateY(-2px);
   }
   .flip-card.flipped .flip-card-inner {
     transform: rotateY(180deg);
@@ -94,15 +97,16 @@
     height: 100%;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    border-radius: 10px;
+    border-radius: var(--radius);
     padding: 16px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     border: 1px solid var(--border);
+    box-shadow: 0 1px 2px rgba(15,23,42,.04);
   }
   .flip-front {
-    background: var(--surface2);
+    background: linear-gradient(180deg,#ffffff 0%,var(--surface2) 100%);
     align-items: center;
     text-align: center;
     gap: 8px;
@@ -116,36 +120,42 @@
     padding: 2px 9px;
     border-radius: 99px;
   }
-  .flip-front h4 { font-size: .88rem; font-weight: 700; color: var(--text); }
+  .flip-front h4 { font-size: .9rem; font-weight: 700; color: var(--text); line-height: 1.35; }
   .flip-front .flip-hint {
-    font-size: .7rem;
-    color: var(--subtle);
+    font-size: .72rem;
+    color: var(--muted);
     margin-top: 4px;
+    font-weight: 600;
   }
   .flip-back {
-    background: var(--primary);
+    background: linear-gradient(160deg,var(--tier) 0%,var(--tier-dark) 100%);
     color: #fff;
     transform: rotateY(180deg);
     gap: 7px;
+    border-color: transparent;
   }
   .flip-back h4 { font-size: .85rem; font-weight: 700; margin-bottom: 2px; }
-  .flip-back ul { padding-left: 15px; font-size: .79rem; line-height: 1.6; }
+  .flip-back ul { padding-left: 15px; font-size: .78rem; line-height: 1.58; }
   .flip-back .flip-examples {
-    font-size: .72rem;
-    background: rgba(255,255,255,.15);
+    font-size: .7rem;
+    background: rgba(255,255,255,.18);
     border-radius: 5px;
     padding: 4px 8px;
     margin-top: 4px;
+    font-weight: 600;
   }
-  .tier-a .flip-front { border-top: 3px solid #2563eb; }
-  .tier-b .flip-front { border-top: 3px solid #16a34a; }
-  .tier-c .flip-front { border-top: 3px solid #d97706; }
-  .tier-a .flip-back { background: #1d4ed8; }
-  .tier-b .flip-back { background: #15803d; }
-  .tier-c .flip-back { background: #b45309; }
-  .tier-a .flip-tier { background: #eff6ff; color: #2563eb; }
-  .tier-b .flip-tier { background: #f0fdf4; color: #16a34a; }
-  .tier-c .flip-tier { background: #fffbeb; color: #d97706; }
+  .tier-a { --tier:#2563eb; --tier-dark:#1e40af; --tier-soft:#eff6ff; }
+  .tier-b { --tier:#16a34a; --tier-dark:#166534; --tier-soft:#f0fdf4; }
+  .tier-c { --tier:#d97706; --tier-dark:#92400e; --tier-soft:#fffbeb; }
+  .tier-d { --tier:#0891b2; --tier-dark:#155e75; --tier-soft:#ecfeff; }
+  .tier-a .flip-front,
+  .tier-b .flip-front,
+  .tier-c .flip-front,
+  .tier-d .flip-front { border-top: 3px solid var(--tier); }
+  .tier-a .flip-tier,
+  .tier-b .flip-tier,
+  .tier-c .flip-tier,
+  .tier-d .flip-tier { background: var(--tier-soft); color: var(--tier); }
 
   /* ── COMPARISON TABLE HIGHLIGHT ── */
   .tier-badge {
@@ -227,7 +237,7 @@
   th{background:var(--surface2);padding:9px 13px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);color:var(--text);}
   td{padding:8px 13px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text);}
   tr:last-child td{border-bottom:none;}
-  tr:nth-child(even) td{background:var(--surface2);}
+  tr:nth-child(odd) td{background:var(--surface2);}
   code{background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:.79rem;font-family:'Courier New',monospace;}
 
   /* ── DIVIDER ── */
@@ -298,6 +308,8 @@
     .mod-header-text{padding:16px 16px;}
     .mod-num-badge{padding:0 16px;min-width:70px;}
     .mod-num-badge .num{font-size:1.3rem;}
+    .flip-grid{grid-template-columns:1fr;}
+    .flip-card{height:230px;}
     .tool-grid{grid-template-columns:1fr 1fr;}
     .mod-nav button{padding:9px 14px;}
   }
@@ -365,108 +377,127 @@
 
     <div class="section">
         <h3>Categories of AI Coding Tools</h3>
-        <p>AI coding tools are not all the same. They fall into <strong>three tiers</strong> — each suited to different tasks. Click each card to learn more.</p>
-  
+      <p>The landscape of AI-assisted coding has shifted from simple "autocomplete" to more "agentic" systems that can manage entire projects. To choose the right tool, it helps to categorize them by how they <strong>integrate</strong> into your workflow and their level of autonomy.</p>
+      <p>Explore the four categories below. Click each card to flip and view key details.</p>
+
         <div class="flip-grid">
-  
-          <!-- Tier A -->
+
           <div class="flip-card tier-a" onclick="this.classList.toggle('flipped')">
             <div class="flip-card-inner">
               <div class="flip-front">
-                <span class="flip-icon">⌨️</span>
-                <span class="flip-tier">Tier A</span>
-                <h4>Inline Assistants</h4>
+                <span class="flip-tier">Category 1</span>
+                <h4>Integrated Extensions</h4>
                 <span class="flip-hint">Tap to see details →</span>
               </div>
               <div class="flip-back">
-                <h4>Inline / IDE-Integrated</h4>
+                <h4>Integrated Extensions</h4>
                 <ul>
-                  <li>Lives inside your code editor</li>
-                  <li>Autocomplete &amp; ghost-text suggestions</li>
-                  <li>Best for boilerplate &amp; repetitive patterns</li>
+                  <li>Plugins for existing editors</li>
+                  <li>Adds AI without changing your IDE</li>
+                  <li>Great for quick in-line support</li>
                 </ul>
-                <div class="flip-examples">📌 e.g. GitHub Copilot, Tabnine</div>
+                <div class="flip-examples">📌 GitHub Copilot, Supermaven</div>
               </div>
             </div>
           </div>
-  
-          <!-- Tier B -->
+
           <div class="flip-card tier-b" onclick="this.classList.toggle('flipped')">
             <div class="flip-card-inner">
               <div class="flip-front">
-                <span class="flip-icon">💬</span>
-                <span class="flip-tier">Tier B</span>
-                <h4>Conversational Assistants</h4>
+                <span class="flip-tier">Category 2</span>
+                <h4>AI-Native IDEs</h4>
                 <span class="flip-hint">Tap to see details →</span>
               </div>
               <div class="flip-back">
-                <h4>Chat / Prompt-Based</h4>
+                <h4>AI-Native IDEs</h4>
                 <ul>
-                  <li>You type a prompt, AI responds</li>
-                  <li>Explain, debug, generate snippets</li>
-                  <li>Best for learning &amp; problem-solving</li>
+                  <li>Built with AI as the core engine</li>
+                  <li>Deep project-wide context</li>
+                  <li>Strong for end-to-end feature work</li>
                 </ul>
-                <div class="flip-examples">📌 e.g. ChatGPT, Claude, Gemini</div>
+                <div class="flip-examples">📌 Cursor, Windsurf, Zed</div>
               </div>
             </div>
           </div>
-  
-          <!-- Tier C -->
+
           <div class="flip-card tier-c" onclick="this.classList.toggle('flipped')">
             <div class="flip-card-inner">
               <div class="flip-front">
-                <span class="flip-icon">🤖</span>
-                <span class="flip-tier">Tier C</span>
-                <h4>Agentic &amp; Specialised AI</h4>
+                <span class="flip-tier">Category 3</span>
+                <h4>Terminal Agents</h4>
                 <span class="flip-hint">Tap to see details →</span>
               </div>
               <div class="flip-back">
-                <h4>Agent / Tool-Using AI</h4>
+                <h4>Terminal Agents</h4>
                 <ul>
-                  <li>Can run code, read files, edit projects</li>
-                  <li>Specialised: docs, tests, UI generation</li>
-                  <li>Best for larger, multi-step tasks</li>
+                  <li>CLI-first autonomous workflows</li>
+                  <li>Can run commands and debug</li>
+                  <li>Useful for headless automation</li>
                 </ul>
-                <div class="flip-examples">📌 e.g. Cursor, v0, Mintlify</div>
+                <div class="flip-examples">📌 Claude Code, Aider</div>
               </div>
             </div>
           </div>
-  
+
+          <div class="flip-card tier-d" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-front">
+                <span class="flip-tier">Category 4</span>
+                <h4>Browser AI Workspaces</h4>
+                <span class="flip-hint">Tap to see details →</span>
+              </div>
+              <div class="flip-back">
+                <h4>Browser AI Workspaces</h4>
+                <ul>
+                  <li>Browser-based AI + hosting</li>
+                  <li>Spin up projects instantly</li>
+                  <li>Best for rapid prototypes</li>
+                </ul>
+                <div class="flip-examples">📌 Replit Agent, Bolt.new</div>
+              </div>
+            </div>
+          </div>
+
         </div>
-  
-        <!-- Comparison table -->
+
         <div class="tbl-wrap" style="margin-top:16px;">
           <table>
             <tr>
               <th>Category</th>
-              <th>How You Use It</th>
-              <th>Example</th>
-              <th>Best For</th>
+              <th>Description</th>
+              <th>Primary Use-Case</th>
+              <th>Key Tools (2026)</th>
             </tr>
             <tr>
-              <td><span class="tier-badge a">Tier A</span> Inline Assistant</td>
-              <td>Ghost-text inside your editor</td>
-              <td>GitHub Copilot</td>
-              <td>Boilerplate, repetitive patterns</td>
+              <td>Integrated Extensions</td>
+              <td>Plugins that add AI capabilities to standard editors.</td>
+              <td>Quick fixes, documentation, and line-by-line help.</td>
+              <td>GitHub Copilot, Supermaven</td>
             </tr>
             <tr>
-              <td><span class="tier-badge b">Tier B</span> Conversational</td>
-              <td>Chat prompt → response</td>
-              <td>ChatGPT, Claude</td>
-              <td>Explanations, debugging, learning</td>
+              <td>AI-Native IDEs</td>
+              <td>Editors built from the ground up with AI as the core engine.</td>
+              <td>High-context refactoring and building full features.</td>
+              <td>Cursor, Windsurf, Zed</td>
             </tr>
             <tr>
-              <td><span class="tier-badge c">Tier C</span> Agentic / Specialised</td>
-              <td>AI plans &amp; acts across files</td>
-              <td>Cursor, v0, Mintlify</td>
-              <td>Multi-file tasks, docs, UI prototyping</td>
+              <td>Terminal Agents</td>
+              <td>CLI-based tools that can run commands, debug, and git commit.</td>
+              <td>Automated testing, environment setup, and "headless" coding.</td>
+              <td>Claude Code, Aider</td>
+            </tr>
+            <tr>
+              <td>Browser AI Workspaces</td>
+              <td>Browser-based tools that bundle AI with instant hosting.</td>
+              <td>Rapid prototyping and "vibe coding" small apps.</td>
+              <td>Replit Agent, Bolt.new</td>
             </tr>
           </table>
         </div>
   
         <div class="callout info" style="margin-top:12px;">
           <span class="callout-icon">💡</span>
-          <span><strong>Key takeaway:</strong> Copilot ≠ ChatGPT ≠ Cursor. Each tool has a different role. Knowing <em>when</em> to use which type makes you a far more effective developer.</span>
+          <span><strong>Key takeaway:</strong> Pick tools based on workflow fit. Extensions help inside existing editors, AI-native IDEs drive deeper feature work, terminal agents automate command-line tasks, and browser AI workspaces speed up prototypes.</span>
         </div>
     </div>
 
