@@ -223,13 +223,29 @@
   .tool-card span{color:var(--muted);line-height:1.55;}
 
   /* ── PROMPT BOX ── */
-  .prompt-box{background:var(--code-bg);border-radius:9px;overflow:hidden;margin:12px 0;border:1px solid #1e293b;}
+  .prompt-box{
+    background:var(--code-bg);
+    border-radius:9px;
+    overflow:hidden;
+    margin:12px 0;
+    border:1px solid #1e293b;
+    display:grid;
+    grid-template-columns:.8fr 1.2fr;
+    grid-template-rows:auto 1fr;
+  }
   .p-label{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px;font-weight:700;}
   .p-label.user{background:#1e3a5f;color:#93c5fd;}
   .p-label.ai{background:#14532d;color:#86efac;}
   .p-label.caution{background:#44270a;color:#fbbf24;}
+  .prompt-box .p-label:nth-of-type(1){grid-column:1;grid-row:1;border-right:1px solid #1e293b;}
+  .prompt-box .prompt-text{grid-column:1;grid-row:2;border-right:1px solid #1e293b;}
+  .prompt-box .p-label:nth-of-type(2){grid-column:2;grid-row:1;}
+  .prompt-box .response-text{grid-column:2;grid-row:2;}
   .prompt-text{color:#cbd5e1;padding:12px 16px;line-height:1.75;font-size:.8rem;}
   .response-text{color:#86efac;padding:12px 16px;line-height:1.75;font-size:.8rem;}
+  .prompt-box.single-response{grid-template-columns:1fr;grid-template-rows:auto 1fr;}
+  .prompt-box.single-response .p-label:nth-of-type(1){grid-column:1;grid-row:1;border-right:none;}
+  .prompt-box.single-response .response-text{grid-column:1;grid-row:2;}
 
   /* ── TABLE ── */
   .tbl-wrap{overflow-x:auto;margin:12px 0;border-radius:8px;border:1px solid var(--border);}
@@ -312,6 +328,13 @@
     .flip-card{height:230px;}
     .tool-grid{grid-template-columns:1fr 1fr;}
     .mod-nav button{padding:9px 14px;}
+    .prompt-box{grid-template-columns:1fr;grid-template-rows:auto auto auto auto;}
+    .prompt-box .p-label:nth-of-type(1){grid-column:1;grid-row:1;border-right:none;}
+    .prompt-box .prompt-text{grid-column:1;grid-row:2;border-right:none;border-bottom:1px solid #1e293b;}
+    .prompt-box .p-label:nth-of-type(2){grid-column:1;grid-row:3;}
+    .prompt-box .response-text{grid-column:1;grid-row:4;}
+    .prompt-box.single-response{grid-template-rows:auto 1fr;}
+    .prompt-box.single-response .response-text{grid-row:2;}
   }
   @media(max-width:400px){.tool-grid{grid-template-columns:1fr;}}
 </style>
@@ -789,7 +812,8 @@ function TodoList({ items }) {
   <span class="kw">return</span> (
     &lt;ul&gt;
       {items.<span class="fn">map</span>(item => (
-        &lt;li <span class="kw">key</span>={item.id}&gt;{item.text}&lt;/li&gt; <span class="cm">// ← key added</span>
+        <span class="cm">// key added:</span>
+        &lt;li <span class="kw">key</span>={item.id}&gt;{item.text}&lt;/li&gt;
       ))}
     &lt;/ul&gt;
   );
@@ -896,7 +920,7 @@ function c(a,b,d){if(d==="add"){return a+b;}else if(d==="sub"){return a-b;}else{
         <span class="callout-icon">🚨</span>
         <span>AI may invent function names or library features that do not exist. Always verify AI-generated code by running it and checking the official documentation.</span>
       </div>
-      <div class="prompt-box">
+      <div class="prompt-box single-response">
         <div class="p-label caution">Example of a Hallucination</div>
         <div class="response-text">app.<span class="fn">useAutoAuth</span>({ provider: <span class="st">'google'</span> });
 <span class="cm">// This method does NOT exist in Express.js.
