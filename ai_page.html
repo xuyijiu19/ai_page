@@ -265,6 +265,14 @@
   .quiz-result.pass{background:#dcfce7;color:#15803d;border:1px solid #86efac;}
   .quiz-result.fail{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;}
   .badge-wrap{display:none;text-align:center;padding:16px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:9px;margin-top:12px;}
+  .quiz-reset-btn{
+    background:var(--surface);color:var(--primary);border:1px solid var(--primary);
+    padding:10px 22px;border-radius:7px;font-size:.86rem;font-weight:600;
+    cursor:pointer;margin-top:6px;margin-left:8px;transition:background .2s,transform .1s;
+    font-family:var(--font);letter-spacing:.01em;display:none;
+  }
+  .quiz-reset-btn:hover{background:var(--primary-light);}
+  .quiz-reset-btn:active{transform:scale(.98);}
   .badge-wrap .badge-icon{font-size:1.8rem;}
   .badge-wrap p{font-size:.85rem;color:#15803d;font-weight:600;margin-top:5px;}
 
@@ -520,7 +528,8 @@ console.<span class="fn">log</span>(result); <span class="cm">// [2, 4, 6]</span
         <label><input type="radio" name="q0_2" value="c"> Delete it because AI code is always wrong.</label>
         <label><input type="radio" name="q0_2" value="d"> Copy it into every project they have.</label>
       </div>
-      <button class="quiz-btn" onclick="submitQuiz(0)">Submit Answers</button>
+      <button class="quiz-btn" id="submitBtn0" onclick="submitQuiz(0)">Submit Answers</button>
+      <button class="quiz-reset-btn" id="resetBtn0" onclick="resetQuiz(0)">↺ Try Again</button>
       <div class="quiz-result" id="result0"></div>
       <div class="badge-wrap" id="badge0"><div class="badge-icon">🏅</div><p>Module 1 Complete</p></div>
     </div>
@@ -668,7 +677,8 @@ app.<span class="fn">listen</span>(3000);</div>
         <label><input type="radio" name="q1_2" value="c"> It is too vague — it lacks context about tech stack, style, or requirements.</label>
         <label><input type="radio" name="q1_2" value="d"> Login pages cannot be made with AI.</label>
       </div>
-      <button class="quiz-btn" onclick="submitQuiz(1)">Submit Answers</button>
+      <button class="quiz-btn" id="submitBtn1" onclick="submitQuiz(1)">Submit Answers</button>
+      <button class="quiz-reset-btn" id="resetBtn1" onclick="resetQuiz(1)">↺ Try Again</button>
       <div class="quiz-result" id="result1"></div>
       <div class="badge-wrap" id="badge1"><div class="badge-icon">🏅</div><p>Module 2 Complete</p></div>
     </div>
@@ -824,7 +834,8 @@ function c(a,b,d){if(d==="add"){return a+b;}else if(d==="sub"){return a-b;}else{
         <label><input type="radio" name="q2_2" value="c"> Rewriting code to be cleaner without changing its behaviour.</label>
         <label><input type="radio" name="q2_2" value="d"> Converting code from one language to another.</label>
       </div>
-      <button class="quiz-btn" onclick="submitQuiz(2)">Submit Answers</button>
+      <button class="quiz-btn" id="submitBtn2" onclick="submitQuiz(2)">Submit Answers</button>
+      <button class="quiz-reset-btn" id="resetBtn2" onclick="resetQuiz(2)">↺ Try Again</button>
       <div class="quiz-result" id="result2"></div>
       <div class="badge-wrap" id="badge2"><div class="badge-icon">🏅</div><p>Module 3 Complete</p></div>
     </div>
@@ -940,7 +951,8 @@ function c(a,b,d){if(d==="add"){return a+b;}else if(d==="sub"){return a-b;}else{
         <label><input type="radio" name="q3_2" value="c"> Because your prompt may be stored or used for training, exposing private credentials.</label>
         <label><input type="radio" name="q3_2" value="d"> Because passwords are too short to be useful context.</label>
       </div>
-      <button class="quiz-btn" onclick="submitQuiz(3)">Submit Answers</button>
+      <button class="quiz-btn" id="submitBtn3" onclick="submitQuiz(3)">Submit Answers</button>
+      <button class="quiz-reset-btn" id="resetBtn3" onclick="resetQuiz(3)">↺ Try Again</button>
       <div class="quiz-result" id="result3"></div>
       <div class="badge-wrap" id="badge3"><div class="badge-icon">🎓</div><p>Course Complete — All 4 Modules Done!</p></div>
     </div>
@@ -978,27 +990,35 @@ function submitQuiz(mod){
       if(v===correct)l.classList.add('correct');
       else if(l.querySelector('input')===sel)l.classList.add('wrong');
     });
-    const fb=document.createElement('div');
-    fb.className='quiz-feedback '+(sel.value===correct?'ok':'bad');
-    fb.textContent=sel.value===correct?'Correct.':'Not quite — see the highlighted answer above.';
-    qEl.appendChild(fb);
     if(sel.value===correct)score++;
   });
   if(!allAnswered){alert('Please answer all questions before submitting.');return;}
   const resultEl=document.getElementById(`result${mod}`);
   const badgeEl=document.getElementById(`badge${mod}`);
   const pass=score>=2;
-  resultEl.style.display='block';
-  resultEl.className='quiz-result '+(pass?'pass':'fail');
-  resultEl.textContent=pass
-    ?`Well done! You scored ${score} out of ${qs.length}. Module complete.`
-    :`You scored ${score} out of ${qs.length}. Review the content above and try again.`;
+  resultEl.style.display='none';
+  document.getElementById(`resetBtn${mod}`).style.display='inline-block';
   if(pass&&!completed[mod]){
     completed[mod]=true;
     badgeEl.style.display='block';
     document.getElementById(`chk${mod}`).classList.add('show');
     updateProgress();
   }
+}
+
+function resetQuiz(mod){
+  const qs=ANSWERS[mod];
+  qs.forEach((_,qi)=>{
+    const name=`q${mod}_${qi}`;
+    const qEl=document.getElementById(`q${mod}_${qi}`);
+    qEl.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+    qEl.querySelectorAll('label').forEach(l=>l.classList.remove('correct','wrong'));
+    const fb=qEl.querySelector('.quiz-feedback');if(fb)fb.remove();
+  });
+  const resultEl=document.getElementById(`result${mod}`);
+  resultEl.style.display='none';
+  resultEl.textContent='';
+  document.getElementById(`resetBtn${mod}`).style.display='none';
 }
 
 function updateProgress(){
