@@ -237,9 +237,9 @@
   .p-label.user{background:#1e3a5f;color:#93c5fd;}
   .p-label.ai{background:#14532d;color:#86efac;}
   .p-label.caution{background:#44270a;color:#fbbf24;}
-  .prompt-box .p-label:nth-of-type(1){grid-column:1;grid-row:1;border-right:1px solid #1e293b;}
+  .prompt-box .p-label:nth-child(1){grid-column:1;grid-row:1;border-right:1px solid #1e293b;}
   .prompt-box .prompt-text{grid-column:1;grid-row:2;border-right:1px solid #1e293b;}
-  .prompt-box .p-label:nth-of-type(2){grid-column:2;grid-row:1;}
+  .prompt-box .p-label:nth-child(3){grid-column:2;grid-row:1;}
   .prompt-box .response-text{grid-column:2;grid-row:2;}
   .prompt-text{color:#cbd5e1;padding:12px 16px;line-height:1.75;font-size:.8rem;}
   .response-text{color:#86efac;padding:12px 16px;line-height:1.75;font-size:.8rem;}
@@ -329,9 +329,9 @@
     .tool-grid{grid-template-columns:1fr 1fr;}
     .mod-nav button{padding:9px 14px;}
     .prompt-box{grid-template-columns:1fr;grid-template-rows:auto auto auto auto;}
-    .prompt-box .p-label:nth-of-type(1){grid-column:1;grid-row:1;border-right:none;}
+    .prompt-box .p-label:nth-child(1){grid-column:1;grid-row:1;border-right:none;}
     .prompt-box .prompt-text{grid-column:1;grid-row:2;border-right:none;border-bottom:1px solid #1e293b;}
-    .prompt-box .p-label:nth-of-type(2){grid-column:1;grid-row:3;}
+    .prompt-box .p-label:nth-child(3){grid-column:1;grid-row:3;}
     .prompt-box .response-text{grid-column:1;grid-row:4;}
     .prompt-box.single-response{grid-template-rows:auto 1fr;}
     .prompt-box.single-response .response-text{grid-row:2;}
@@ -690,6 +690,22 @@ app.<span class="fn">listen</span>(3000);</div>
       <div class="prompt-box">
         <div class="p-label user">Chain-of-Thought Prompt</div>
         <div class="prompt-text">I want to fetch data from an API and display it in a React component. Think through the steps first, then write the code using fetch() with useState and useEffect hooks.</div>
+        <div class="p-label ai">AI Response</div>
+        <div class="response-text"><span class="cm">// Steps: 1) declare state, 2) fetch on mount, 3) render
+// Then the code:</span>
+<span class="kw">import</span> { useState, useEffect } <span class="kw">from</span> <span class="st">'react'</span>;
+
+<span class="kw">function</span> <span class="fn">UserList</span>() {
+  <span class="kw">const</span> [users, setUsers] = <span class="fn">useState</span>([]);
+
+  <span class="fn">useEffect</span>(() => {
+    <span class="fn">fetch</span>(<span class="st">'https://api.example.com/users'</span>)
+      .<span class="fn">then</span>(r => r.<span class="fn">json</span>())
+      .<span class="fn">then</span>(data => <span class="fn">setUsers</span>(data));
+  }, []);
+
+  <span class="kw">return</span> &lt;ul&gt;{users.<span class="fn">map</span>(u =&gt; &lt;li key={u.id}&gt;{u.name}&lt;/li&gt;)}&lt;/ul&gt;;
+}</div>
       </div>
     </div>
 
@@ -926,6 +942,10 @@ function c(a,b,d){if(d==="add"){return a+b;}else if(d==="sub"){return a-b;}else{
 <span class="cm">// This method does NOT exist in Express.js.
 // AI invented it — your code will crash.</span></div>
       </div>
+      <div class="callout info">
+        <span class="callout-icon">📝</span>
+        <span>Note: AI is a probabilistic tool, not a database. It predicts the most likely next word, which is why it can sometimes "invent" code that sounds convincing but does not actually exist.</span>
+      </div>
     </div>
 
     <div class="section">
@@ -942,9 +962,14 @@ function c(a,b,d){if(d==="add"){return a+b;}else if(d==="sub"){return a-b;}else{
     <div class="section">
       <h3>Limitation 3: No Knowledge of Your Full Project</h3>
       <p>AI only sees what you paste into the chat. It has no knowledge of your full project structure, existing variables, or other files — which can lead to suggestions that break other parts of your code.</p>
+      <p>This is related to a model's <strong>context window</strong> — the limited amount of text it can "hold in mind" at one time. If key files or requirements are missing from that window, the AI may make incorrect assumptions.</p>
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <span>Pasting too much code at once can also reduce answer quality. Long chats may push earlier messages out of the context window, so the AI can "forget" details from the beginning of the conversation.</span>
+      </div>
       <div class="callout tip">
         <span class="callout-icon">💡</span>
-        <span>Describe your project structure or paste related files so the AI can give more accurate, context-aware advice.</span>
+        <span>Share only the most relevant files, summarize the project structure, and restate key constraints to keep important context visible.</span>
       </div>
     </div>
 
@@ -967,6 +992,7 @@ function c(a,b,d){if(d==="add"){return a+b;}else if(d==="sub"){return a-b;}else{
       <h3>Intellectual Property and Privacy</h3>
       <ul>
         <li><strong>Never paste private data</strong> — Credentials, API keys, and user data should never go into a public AI tool.</li>
+        <li><strong>Avoid hardcoded secrets in AI-generated code</strong> — If AI suggests <code>const apiKey = '12345';</code>, replace it with environment variables such as <code>process.env.API_KEY</code>.</li>
         <li><strong>Code ownership is unclear</strong> — AI-generated code may reflect copyrighted patterns. Check your organisation's policy for production projects.</li>
         <li><strong>Your prompts may be stored</strong> — Be careful what confidential project details you share.</li>
       </ul>
